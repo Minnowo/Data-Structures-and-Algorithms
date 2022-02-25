@@ -244,7 +244,7 @@ def evaluate(tokenized):
     # evaluates + and -
     while i + 1 < length:
 
-        # display(tokenized)
+        display(tokenized)
 
         i += 1
         obj = tokenized[i]
@@ -274,6 +274,8 @@ def evaluate(tokenized):
 
             # adjust length and continue
             length = len(tokenized)
+
+            i = -1
             continue
         
         # int +- int 
@@ -292,21 +294,24 @@ def evaluate(tokenized):
             # adjust length and continue 
             length = len(tokenized)
 
+            i = -1
+
     # return the result 
     return tokenized[0]["string"]
 
 
 
 def main():
-    print(evaluate(get_tokens("(12 - 1) + 255 * 255 - 999/58")))
-    print(evaluate(get_tokens("5 * 7 + (2 + 4 *(1 + 3))")))
-    print(evaluate(get_tokens("2 + (10 * 10)")))
-    print(evaluate(get_tokens("2 / (2 + 3) * 4.33 - -6")))
-    print(evaluate(get_tokens("(1 - 2) + -(-(-(-4)))")))
-    print(evaluate(get_tokens("5 * (2 + -4 / (1 + 1)) + 2.5")))
-    print(evaluate(get_tokens("-(-1+2)")))
-    print(evaluate(get_tokens("12 * 123 / -(-5 + 2.5)")))
-    print(evaluate(get_tokens("2 / (2 + 3.33) * 4 --6")))
+    # print(evaluate(get_tokens("(12 - 1) + 255 * 255 - 999/58")))
+    # print(evaluate(get_tokens("5 * 7 + (2 + 4 *(1 + 3))")))
+    # print(evaluate(get_tokens("2 + (10 * 10)")))
+    # print(evaluate(get_tokens("2 / (2 + 3) * 4.33 - -6")))
+    # print(evaluate(get_tokens("(1 - 2) + -(-(-(-4)))")))
+    # print(evaluate(get_tokens("5 * (2 + -4 / (1 + 1)) + 2.5")))
+    # print(evaluate(get_tokens("-(-1+2)")))
+    # print(evaluate(get_tokens("12 * 123 / -(-5 + 2.5)")))
+    # print(evaluate(get_tokens("2 / (2 + 3.33) * 4 --6")))
+    print(evaluate(get_tokens("10 - 2 - -5")))
 
 if __name__ == "__main__":
     main()
