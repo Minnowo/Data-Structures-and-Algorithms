@@ -23,8 +23,56 @@ public class AVLP <T extends Comparable<T>>
         }
     }
 
-    Node<T> root;
+    /**
+     * A simple linked list used during successor and predecessor
+     */
+    public static class SimpleDoublyLinkedList<K> 
+    {
+        public SimpleDoublyLinkedList<K>  next;
+        public SimpleDoublyLinkedList<K>  prev;
+        public K node;
+        
+        public SimpleDoublyLinkedList()
+        {
+            
+        }
+        
+        public SimpleDoublyLinkedList(K node)
+        {
+            this.node = node;
+        }
+        
+        /**
+         * sets this link's next pointer to a new @SimpleDoublyLinkedList 
+         */
+        public SimpleDoublyLinkedList<K> createNext()
+        {
+            this.next = new SimpleDoublyLinkedList<K>();
+            this.next.prev = this;
+            return this.next;
+        }
+        
+        /**
+         * sets this link's next pointer to a new @SimpleDoublyLinkedList with the given node
+         */
+        public SimpleDoublyLinkedList<K> createNext(K node)
+        {
+            this.next = new SimpleDoublyLinkedList<K>(node);
+            this.next.prev = this;
+            return this.next;
+        }
+        
+        public String toString()
+        {
+            return this.node.toString();
+        }
+    }
 
+    private Node<T> root;
+
+    /**
+     * Inserts the given value into the tree
+     */
     public void insert(T data)
     {
         // make a new root and we're done
@@ -75,13 +123,6 @@ public class AVLP <T extends Comparable<T>>
             }
         }
 
-        /* pretty sure this is not needed 
-
-            // can't rotate if there's only 1 child 
-            if(newNode.parent == this.root)
-                return;
-
-        */
         
         // magic happens here,
         // loop back up the tree, and rotate where needed
@@ -177,6 +218,10 @@ public class AVLP <T extends Comparable<T>>
         }
     }
 
+
+    /**
+     * Deletes the given value from the tree
+     */
     public void delete(T data)
     {
         if(this.root == null)
@@ -358,7 +403,223 @@ public class AVLP <T extends Comparable<T>>
         }
     }
 
+
+        /**
+     * Returns the value to the right (in order) of the given value
+     */
+    public T inOrderSuccessor(T value)
+    {
+        if(value == null)
+            return null;
     
+        Node<T> val = InOrderSuccessor(this.root, value);
+        
+        if(val == null)
+            return null;
+        
+        return val.data;
+    }
+
+
+    /**
+     * Returns the value to the right (in order) of the given value in the given tree
+     */
+    public static <J extends Comparable<J>> Node<J> InOrderSuccessor(Node<J> root, J value)
+	{
+		if(root == null)
+			return null;
+		
+		if(root.data.compareTo(value) == 0)
+			return leftMost(root.right);
+		
+        Node<J> node = root;
+
+		for(;;)
+		{
+			if(value.compareTo(node.data) < 0)
+			{
+				if(node.left == null)
+					return null;
+				
+				// the current nodes left node is what we're looking for, easy 
+				// Case 1, the current node is the parent of a left child
+				if(node.left.data.equals(value))
+				{
+					// if the left child has no right nodes, return the parent
+					if(node.left.right == null)
+					{
+						return node;
+					}
+					
+					// otherwise we can get the leftmost right node
+					return leftMost(node.left.right);
+				}
+				
+				node = node.left;
+			}
+			else if(value.compareTo(node.data) > 0)
+			{
+				if(node.right == null)
+					return null;
+				
+				// Case 2, the current node has a right child, with a right child
+				// get it's leftmost child and we're done
+				if(node.right.right != null && node.right.data.equals(value))
+				{
+					return leftMost(node.right.right);
+				}
+				
+				node = node.right;
+			}
+			else 
+			{
+				// worst case here
+				break;
+			}
+		}
+
+		// this is worst case for this function
+
+        // node = node.parent;
+
+		for(;;)
+		{
+			// we're at the rightmost node in the tree 
+			if(node.parent == null)
+				return null;
+
+			// need to keep looking up at the parent nodes until we find where we're on the left
+			// if we can't find a spot we're on the left, we have the rightmost node in the tree
+			if(node == node.parent.left)
+			{
+				return node.parent;
+			}
+			
+            node = node.parent;
+		}
+	}
+
+
+    /**
+     * Returns the value to the left (in order) of the given value
+     */
+    public T inOrderPredecessor(T value)
+    {
+        if(value == null)
+            return null;
+    
+        Node<T> val = inOrderPredecessor(this.root, value);
+        
+        if(val == null)
+            return null;
+        
+        return val.data;
+    }
+
+
+    /**
+     * Returns the value to the left (in order) of the given value in the given tree
+     */
+    public static <J extends Comparable<J>> Node<J> inOrderPredecessor(Node<J> root, J value)
+	{
+        if(root == null)
+            return null;
+
+        if(root.data.equals(value))
+            return rightMost(root.left);
+
+        Node<J> node = root;
+
+        for(;;)
+        {
+            if(value.compareTo(node.data) < 0)
+            {
+                if(node.left == null)
+                    return null;
+                
+                // Case 2, the current node has a left child, with a left child
+                // get it's rightmost child and we're done
+                if(node.left.left != null && node.left.data.equals(value))
+                {
+                    return rightMost(node.left.left);
+                }
+                
+
+                node = node.left;
+            }
+            else if(value.compareTo(node.data) > 0)
+            {
+                if(node.right == null)
+                    return null;
+                
+                // the current nodes right node is what we're looking for, easy 
+                // Case 1, the current node is the parent of a right child
+                if(node.right.data.equals(value))
+                {
+                    // if the right child has no left nodes, return the parent
+                    if(node.right.left == null)
+                    {
+                        return node;
+                    }
+                    
+                    // otherwise we can get the rightmost left node
+                    return rightMost(node.right.left);
+                }
+                
+                node = node.right;
+            }
+            else 
+            {
+                // worst case here
+                break;
+            }
+        }
+
+        // this is worst case for this function
+
+        node = node.parent;
+
+        for(;;)
+        {
+            // we're at the rightmost node in the tree 
+            if(node.parent == null)
+                return null;
+
+            // need to keep looking up at the parent nodes until we find where we're on the right
+            // if we can't find a spot we're on the left, we have the leftmost node in the tree
+            // if(fakeLinkedList.node.data.equals(fakeLinkedList.prev.node.right.data))
+            if(node == node.parent.right)
+            {
+                return node.parent;
+            }
+
+            node = node.parent;
+        }
+	}
+
+
+    /**
+     * Returns the leftmost value in the tree
+     */
+    public T leftMost()
+    {
+        if(this.root == null)
+            return null;
+
+        return leftMost(this.root).data;
+    }
+
+
+    /**
+     * Returns the rightmost value in the tree
+     */
+    public T rightMost()
+    {
+        if(this.root == null)
+            return null;
+
+        return rightMost(this.root).data;
+    }
 
     /**
      * Prints the tree in the order left, root, right
@@ -511,7 +772,7 @@ public class AVLP <T extends Comparable<T>>
         newRoot.right = node;
 
         // recalculate the height of [x]
-        node.height = getMax(   getHeight(node.left),    getHeight(node.right)) + 1;
+        node.height = getMax(getHeight(node.left), getHeight(node.right)) + 1;
 
         // recalculate the height of [y]
         newRoot.height = getMax(getHeight(newRoot.left), getHeight(newRoot.right)) + 1;
@@ -521,7 +782,10 @@ public class AVLP <T extends Comparable<T>>
 
         // there has to be a better way of doing this 
         if(newRoot.left != null && newRoot.left.right != null)
-        	newRoot.left.right.parent = newRoot.left;
+            newRoot.left.right.parent = newRoot.left;
+
+        if(newRoot.right != null && newRoot.right.left != null)
+            newRoot.right.left.parent = newRoot.right;
 
         return newRoot;
     }
@@ -557,8 +821,11 @@ public class AVLP <T extends Comparable<T>>
 
         // there has to be a better way of doing this 
         if(newRoot.right != null && newRoot.right.left != null)
-        	newRoot.right.left.parent = newRoot.right;
-
+            newRoot.right.left.parent = newRoot.right;
+        
+        if(newRoot.left != null && newRoot.left.right != null)
+            newRoot.left.right.parent = newRoot.left;
+        
         return newRoot;
     }
 }

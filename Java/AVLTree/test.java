@@ -28,7 +28,26 @@ public class test
         System.out.println("\nAVL tree in order:");
         tree1.inOrder();
 
+        System.out.println("\nin order using Successor");
+
+        Integer i = tree1.leftMost();
+        for(; i != null;)
+        {
+            System.out.print(i + ", ");
+            i = tree1.inOrderSuccessor(i);
+        }
         System.out.println();
+
+        System.out.println("\nin reverse order using Predecessor");
+
+        i = tree1.rightMost();
+        for(; i != null;)
+        {
+            System.out.print(i + ", ");
+            i = tree1.inOrderPredecessor(i);
+        }
+        System.out.println();
+        System.out.println("\n======================================");
 
 
 
@@ -58,5 +77,24 @@ public class test
 
         System.out.println("\nAVLP tree in order:");
         tree2.inOrder();
+
+        System.out.println("\nin order using Successor");
+
+        i = tree2.leftMost();
+        for(; i != null;)
+        {
+            System.out.print(i + ", ");
+            i = tree2.inOrderSuccessor(i);
+        }
+        System.out.println();
+        System.out.println("\nin reverse order using Predecessor");
+
+        i = tree2.rightMost();
+        for(; i != null;)
+        {
+            System.out.print(i + ", ");
+            i = tree2.inOrderPredecessor(i);
+        }
+        System.out.println();
     }    
 }

@@ -23,6 +23,51 @@ public class AVL <T extends Comparable<T>>
         }
     }
 
+    /**
+     * A simple linked list used during successor and predecessor
+     */
+    public static class SimpleDoublyLinkedList<K> 
+    {
+        public SimpleDoublyLinkedList<K>  next;
+        public SimpleDoublyLinkedList<K>  prev;
+        public K node;
+        
+        public SimpleDoublyLinkedList()
+        {
+            
+        }
+        
+        public SimpleDoublyLinkedList(K node)
+        {
+            this.node = node;
+        }
+        
+        /**
+         * sets this link's next pointer to a new @SimpleDoublyLinkedList 
+         */
+        public SimpleDoublyLinkedList<K> createNext()
+        {
+            this.next = new SimpleDoublyLinkedList<K>();
+            this.next.prev = this;
+            return this.next;
+        }
+        
+        /**
+         * sets this link's next pointer to a new @SimpleDoublyLinkedList with the given node
+         */
+        public SimpleDoublyLinkedList<K> createNext(K node)
+        {
+            this.next = new SimpleDoublyLinkedList<K>(node);
+            this.next.prev = this;
+            return this.next;
+        }
+        
+        public String toString()
+        {
+            return this.node.toString();
+        }
+    }
+
     private Node<T> root;
 
     /**
@@ -222,6 +267,249 @@ public class AVL <T extends Comparable<T>>
         return node;
     }
 
+
+    /**
+     * Returns the value to the right (in order) of the given value
+     */
+    public T inOrderSuccessor(T value)
+    {
+        if(value == null)
+            return null;
+    
+        Node<T> val = InOrderSuccessor(this.root, value);
+        
+        if(val == null)
+            return null;
+        
+        return val.data;
+    }
+
+
+    /**
+     * Returns the value to the right (in order) of the given value in the given tree
+     */
+    public static <J extends Comparable<J>> Node<J> InOrderSuccessor(Node<J> root, J value)
+	{
+		if(root == null)
+			return null;
+		
+		if(root.data.compareTo(value) == 0)
+			return leftMost(root.right);
+		
+		// this acts like a stack if a certain case appears 
+		SimpleDoublyLinkedList<Node<J>> fakeLinkedList = new SimpleDoublyLinkedList<>(); 
+
+		for(Node<J> node = root;;)
+		{
+			fakeLinkedList.node = node;
+			fakeLinkedList.createNext();
+			fakeLinkedList = fakeLinkedList.next;
+			
+			if(value.compareTo(node.data) < 0)
+			{
+				if(node.left == null)
+					return null;
+				
+				// the current nodes left node is what we're looking for, easy 
+				// Case 1, the current node is the parent of a left child
+				if(node.left.data.equals(value))
+				{
+					// if the left child has no right nodes, return the parent
+					if(node.left.right == null)
+					{
+						return node;
+					}
+					
+					// otherwise we can get the leftmost right node
+					return leftMost(node.left.right);
+				}
+				
+				node = node.left;
+			}
+			else if(value.compareTo(node.data) > 0)
+			{
+				if(node.right == null)
+					return null;
+				
+				// Case 2, the current node has a right child, with a right child
+				// get it's leftmost child and we're done
+				if(node.right.right != null && node.right.data.equals(value))
+				{
+					return leftMost(node.right.right);
+				}
+				
+				node = node.right;
+			}
+			else 
+			{
+				// worst case here
+				break;
+			}
+		}
+
+		// this is worst case for this function, since it's more steps and ram usage by the linked list
+
+		// remove empty last node, created at the start of the loop above
+		fakeLinkedList = fakeLinkedList.prev;
+		fakeLinkedList.next = null;
+		
+		// remove current node we found, this node we were looking for 
+		fakeLinkedList = fakeLinkedList.prev;
+		fakeLinkedList.next = null;
+		
+	
+		for(;;)
+		{
+			// we're at the rightmost node in the tree 
+			if(fakeLinkedList.prev == null)
+				return null;
+
+			// need to keep looking up at the parent nodes until we find where we're on the left
+			// if we can't find a spot we're on the left, we have the rightmost node in the tree
+			if(fakeLinkedList.node == fakeLinkedList.prev.node.left)
+			{
+				return fakeLinkedList.prev.node;
+			}
+			
+			fakeLinkedList = fakeLinkedList.prev;
+			fakeLinkedList.next = null;
+		}
+	}
+	
+
+    /**
+     * Returns the value to the left (in order) of the given value
+     */
+    public T inOrderPredecessor(T value)
+    {
+        if(value == null)
+            return null;
+    
+        Node<T> val = inOrderPredecessor(this.root, value);
+        
+        if(val == null)
+            return null;
+        
+        return val.data;
+    }
+
+
+    /**
+     * Returns the value to the left (in order) of the given value in the given tree
+     */
+    public static <J extends Comparable<J>> Node<J> inOrderPredecessor(Node<J> root, J value)
+	{
+        if(root == null)
+            return null;
+
+        if(root.data.equals(value))
+            return rightMost(root.left);
+
+        // this acts like a stack if a certain case appears 
+        SimpleDoublyLinkedList<Node<J>> fakeLinkedList = new SimpleDoublyLinkedList<>(); 
+
+        for(Node<J> node = root;;)
+        {
+            fakeLinkedList.node = node;
+            fakeLinkedList.createNext();
+            fakeLinkedList = fakeLinkedList.next;
+
+            if(value.compareTo(node.data) < 0)
+            {
+                if(node.left == null)
+                    return null;
+                
+                // Case 2, the current node has a left child, with a left child
+                // get it's rightmost child and we're done
+                if(node.left.left != null && node.left.data.equals(value))
+                {
+                    return rightMost(node.left.left);
+                }
+                
+
+                node = node.left;
+            }
+            else if(value.compareTo(node.data) > 0)
+            {
+                if(node.right == null)
+                    return null;
+                
+                // the current nodes right node is what we're looking for, easy 
+                // Case 1, the current node is the parent of a right child
+                if(node.right.data.equals(value))
+                {
+                    // if the right child has no left nodes, return the parent
+                    if(node.right.left == null)
+                    {
+                        return node;
+                    }
+                    
+                    // otherwise we can get the rightmost left node
+                    return rightMost(node.right.left);
+                }
+                
+                node = node.right;
+            }
+            else 
+            {
+                // worst case here
+                break;
+            }
+        }
+
+        // this is worst case for this function, since it's more steps and ram usage by the linked list
+
+        // remove empty last node, created at the start of the loop above
+        fakeLinkedList = fakeLinkedList.prev;
+        fakeLinkedList.next = null;
+
+        // remove current node we found, this node we were looking for 
+        fakeLinkedList = fakeLinkedList.prev;
+        fakeLinkedList.next = null;
+
+
+        for(;;)
+        {
+            // we're at the rightmost node in the tree 
+            if(fakeLinkedList.prev == null)
+                return null;
+
+            // need to keep looking up at the parent nodes until we find where we're on the right
+            // if we can't find a spot we're on the left, we have the leftmost node in the tree
+            // if(fakeLinkedList.node.data.equals(fakeLinkedList.prev.node.right.data))
+            if(fakeLinkedList.node == fakeLinkedList.prev.node.right)
+            {
+                return fakeLinkedList.prev.node;
+            }
+
+            fakeLinkedList = fakeLinkedList.prev;
+            fakeLinkedList.next = null;
+        }
+	}
+
+
+    /**
+     * Returns the leftmost value in the tree
+     */
+    public T leftMost()
+    {
+        if(this.root == null)
+            return null;
+
+        return leftMost(this.root).data;
+    }
+
+
+    /**
+     * Returns the rightmost value in the tree
+     */
+    public T rightMost()
+    {
+        if(this.root == null)
+            return null;
+
+        return rightMost(this.root).data;
+    }
 
 
     /**
