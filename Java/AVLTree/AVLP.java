@@ -1,6 +1,10 @@
 
 
-
+/**
+ * AVLP Tree template class, must be comparable types to use <br>
+ * 
+ * This AVL Tree has each node keep track of the parent node
+*/
 public class AVLP <T extends Comparable<T>>
 {
     public static class Node <K extends Comparable<K>>
@@ -20,51 +24,6 @@ public class AVLP <T extends Comparable<T>>
         {
             this.data = data;
             this.height = 1;
-        }
-    }
-
-    /**
-     * A simple linked list used during successor and predecessor
-     */
-    public static class SimpleDoublyLinkedList<K> 
-    {
-        public SimpleDoublyLinkedList<K>  next;
-        public SimpleDoublyLinkedList<K>  prev;
-        public K node;
-        
-        public SimpleDoublyLinkedList()
-        {
-            
-        }
-        
-        public SimpleDoublyLinkedList(K node)
-        {
-            this.node = node;
-        }
-        
-        /**
-         * sets this link's next pointer to a new @SimpleDoublyLinkedList 
-         */
-        public SimpleDoublyLinkedList<K> createNext()
-        {
-            this.next = new SimpleDoublyLinkedList<K>();
-            this.next.prev = this;
-            return this.next;
-        }
-        
-        /**
-         * sets this link's next pointer to a new @SimpleDoublyLinkedList with the given node
-         */
-        public SimpleDoublyLinkedList<K> createNext(K node)
-        {
-            this.next = new SimpleDoublyLinkedList<K>(node);
-            this.next.prev = this;
-            return this.next;
-        }
-        
-        public String toString()
-        {
-            return this.node.toString();
         }
     }
 
@@ -404,7 +363,7 @@ public class AVLP <T extends Comparable<T>>
     }
 
 
-        /**
+    /**
      * Returns the value to the right (in order) of the given value
      */
     public T inOrderSuccessor(T value)
@@ -480,11 +439,10 @@ public class AVLP <T extends Comparable<T>>
 
 		// this is worst case for this function
 
-        // node = node.parent;
-
-		for(;;)
+		for(node = node.parent;;) 
 		{
 			// we're at the rightmost node in the tree 
+            // we can't put this in the forloop for some reason?
 			if(node.parent == null)
 				return null;
 
@@ -577,9 +535,7 @@ public class AVLP <T extends Comparable<T>>
 
         // this is worst case for this function
 
-        node = node.parent;
-
-        for(;;)
+        for(node = node.parent;;)
         {
             // we're at the rightmost node in the tree 
             if(node.parent == null)
